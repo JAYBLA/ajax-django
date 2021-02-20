@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="" method="POST" id="post-form" data-ajax-url="{% url 'main:create-post' %}">
+        {% csrf_token %}
+        {{ form.description }}
+        <div id="results"></div> <!-- errors go here -->
+        <input type="submit" value="Post" class="tiny button">
+    </form>
+
+    <div class="container-fluid">        
+        <div id="comments">
+            {% for post in posts %}
+            <p>{{post.description}}</p>
+            {% endfor %}
+        </div>    
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+
+    <script>
+        $(document).ready(function(){
+            console.log('document');
+         });
+    </script>
+    <script>
+        $('#post-form').submit(function(e) {
+            e.preventDefault();
+            var serializedData = $(this).serialize();
+            var url = $(this).attr('data-ajax-url');
+            console.log(serializedData);
+            console.log(url);
+
+            $.ajax({ 
+                type:'POST',                     
+                url: url,                    
+                data: serializedData,
+                success: function (response) {
+                    // on successfull creating object
+                    // 1. clear the form.
+                     $("#post-form").trigger('reset');
+                    // display the newly friend to table.
+                    var instance = JSON.parse(response["instance"]);
+                    var fields = instance[0]["fields"];
+                    $("#comments").prepend(
+                        // `<tr>
+                        // <td>${fields["nick_name"]||""}</td>
+                        // <td>${fields["first_name"]||""}</td>
+                        // <td>${fields["last_name"]||""}</td>
+                        // <td>${fields["likes"]||""}</td>
+                        // <td>${fields["dob"]||""}</td>
+                        // <td>${fields["lives_in"]||""}</td>
+                        // </tr>`
+                        `<p>${fields["description"]||""}</p>`
+                    )
+                }
+            });
+        });
+
+
+    </script>
+</body>
+</html>
